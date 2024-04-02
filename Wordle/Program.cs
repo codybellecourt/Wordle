@@ -55,20 +55,6 @@
 				Environment.Exit(0);
 			}
 
-			// Print the gameboard to the console
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-			Console.WriteLine("");
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-			Console.WriteLine("");
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-			Console.WriteLine("");
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-			Console.WriteLine("");
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-			Console.WriteLine("");
-			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
-
-
 			// Pick a solution from the solutionWords list
 			Random rng = new Random();
 			string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
@@ -88,6 +74,19 @@
 			// The position the console needs to print to
 			int posLeft = 0;
 			int posTop = 0;
+
+			// Print the gameboard to the console
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
+			Console.WriteLine("");
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
+			Console.WriteLine("");
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
+			Console.WriteLine("");
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
+			Console.WriteLine("");
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
+			Console.WriteLine("");
+			Console.WriteLine("[ ]  [ ]  [ ]  [ ]  [ ] ");
 
 			while (true)
 			{
@@ -229,7 +228,6 @@
 								Console.ForegroundColor = ConsoleColor.Yellow;
 								Console.Write(guess[i]);
 								Console.ResetColor();
-
 							}
 						}
 
@@ -240,10 +238,28 @@
 
 
 						// Check if the game should continue
-						if (turn < 6 && guessedWord != solutionWord)
+						switch ((turn, (guessedWord == solutionWord)))
 						{
-							// Increment the turn variable
-							turn++;
+							case (1, true):
+							case (2, true):
+							case (3, true):
+							case (4, true):
+							case (5, true):
+							case (6, true):
+								Console.WriteLine("You got it right!");
+								break;
+
+							case (1, false):
+							case (2, false):
+							case (3, false):
+							case (4, false):
+							case (5, false):
+								turn++;
+								break;
+
+							case (6, false):
+								Console.WriteLine("You suck the word was " + solutionWord);
+								break;
 						}
 					}
 
@@ -272,14 +288,16 @@
 
 							Console.SetCursorPosition(posLeft, posTop);
 							Console.Write(' ');
-							index--;
-							guess[i] = ' ';
 						}
 
+						// Reset the index and guessedWord variables.
+						index = 0;
+						guessedWord = null;
+						Array.Clear(guess, 0, guess.Length);
 					}
 
-					}
 				}
 			}
 		}
 	}
+}
