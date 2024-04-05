@@ -1,4 +1,8 @@
-﻿namespace Wordle
+﻿using System;
+using System.IO;
+using TextCopy;
+
+namespace Wordle
 {
 	internal class Program
 	{
@@ -61,6 +65,15 @@
 
 			// An array of each character guessed
 			char[] guess = new char[5];
+
+			// Arrays for scoring
+			int[] turn1 = new int[5];
+			int[] turn2 = new int[5];
+			int[] turn3 = new int[5];
+			int[] turn4 = new int[5];
+			int[] turn5 = new int[5];
+			int[] turn6 = new int[5];
+
 
 			// The character in the word guessed
 			int index = 0;
@@ -177,6 +190,26 @@
 						{
 							if (guessedWord[i] == solutionWord[i]) // The guessed letter is correct and in the correct position.
 							{
+								// Add a '2' to the turn array for scoring.
+								switch (turn)
+								{
+									case 1:
+										turn1[i] = 2;
+										break;
+									case 2:
+										turn2[i] = 2;
+										break;
+									case 3:
+										turn3[i] = 2;
+										break;
+									case 4:
+										turn4[i] = 2;
+										break;
+									case 5:
+										turn5[i] = 2;
+										break;
+								}
+
 								int posLeftCheck = 0;
 
 								switch (i)
@@ -204,6 +237,26 @@
 							}
 							else if (solutionWord.Contains(guessedWord[i])) // The guessed letter is correct but in the wrong position.
 							{
+								// Add a '1' (wrong place) to the turn array for scoring.
+								switch (turn)
+								{
+									case 1:
+										turn1[i] = 1;
+										break;
+									case 2:
+										turn2[i] = 1;
+										break;
+									case 3:
+										turn3[i] = 1;
+										break;
+									case 4:
+										turn4[i] = 1;
+										break;
+									case 5:
+										turn5[i] = 1;
+										break;
+								}
+
 								int posLeftCheck = 0;
 
 								switch (i)
@@ -229,6 +282,28 @@
 								Console.Write(guess[i]);
 								Console.ResetColor();
 							}
+							else
+							{
+								// Add a '0' (incorrect) to the turn array for scoring.
+								switch (turn)
+								{
+									case 1:
+										turn1[i] = 0;
+										break;
+									case 2:
+										turn2[i] = 0;
+										break;
+									case 3:
+										turn3[i] = 0;
+										break;
+									case 4:
+										turn4[i] = 0;
+										break;
+									case 5:
+										turn5[i] = 0;
+										break;
+								}
+							}
 						}
 
 						// Reset the index and guessedWord variables for the next turn
@@ -246,7 +321,9 @@
 							case (4, true):
 							case (5, true):
 							case (6, true):
-								Console.WriteLine("You got it right!");
+								Console.SetCursorPosition(0, 12);
+								Console.WriteLine("You got it right!\n");
+								Result(turn1, turn2, turn3, turn4, turn5, turn6);
 								break;
 
 							case (1, false):
@@ -258,7 +335,9 @@
 								break;
 
 							case (6, false):
-								Console.WriteLine("You suck the word was " + solutionWord);
+								Console.SetCursorPosition(0, 12);
+								Console.WriteLine("The word was " + solutionWord + "\n");
+								Result(turn1, turn2, turn3, turn4, turn5, turn6);
 								break;
 						}
 					}
@@ -297,6 +376,152 @@
 					}
 
 				}
+			}
+		}
+
+		static void Result(int[] turn1, int[] turn2, int[] turn3, int[] turn4, int[] turn5, int[] turn6)
+		{
+			string copyToClipboard = "";
+			string emoji0 = "⬜";
+			string emoji1 = "🟨";
+			string emoji2 = "🟩";
+
+			foreach (int c in turn1)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+			Console.WriteLine();
+			copyToClipboard += "\n";
+			foreach (int c in turn2)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+			Console.WriteLine();
+			copyToClipboard += "\n";
+			foreach (int c in turn3)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+			Console.WriteLine();
+			copyToClipboard += "\n";
+			foreach (int c in turn4)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+			Console.WriteLine();
+			copyToClipboard += "\n";
+			foreach (int c in turn5)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+			Console.WriteLine();
+			copyToClipboard += "\n";
+			foreach (int c in turn6)
+			{
+				switch (c)
+				{
+					case 0:
+						Console.ForegroundColor = ConsoleColor.White;
+						copyToClipboard += emoji0;
+						break;
+					case 1:
+						Console.ForegroundColor = ConsoleColor.Yellow;
+						copyToClipboard += emoji1;
+						break;
+					case 2:
+						Console.ForegroundColor = ConsoleColor.Green;
+						copyToClipboard += emoji2;
+						break;
+				}
+				Console.Write("■");
+				Console.ResetColor();
+			}
+
+			Console.WriteLine("Would you like to copy your game result to the clipboard?");
+			var keyInfo = Console.ReadKey(intercept: true);
+			if (keyInfo.KeyChar == 'y')
+			{
+				ClipboardService.SetText(copyToClipboard);
 			}
 		}
 	}
