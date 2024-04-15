@@ -24,15 +24,15 @@ namespace Wordle
 			// Read the valid words file, and append each word to the validWords list.
 			try
 			{
-				StreamReader valid = new StreamReader(validFilePath);
+				StreamReader validReader = new StreamReader(validFilePath);
 
-				while (!valid.EndOfStream)
+				while (!validReader.EndOfStream)
 				{
-					string line = valid.ReadLine();
+					string line = validReader.ReadLine();
 					validWords.Add(line);
 					validFileLength++;
 				}
-				valid.Close();
+				validReader.Close();
 			}
 			catch (Exception e)
 			{
@@ -43,15 +43,15 @@ namespace Wordle
 			// Read the solution words file, and append each word to the solutionWords list.
 			try
 			{
-				StreamReader solution = new StreamReader(solutionFilePath);
+				StreamReader solutionReader = new StreamReader(solutionFilePath);
 
-				while (!solution.EndOfStream)
+				while (!solutionReader.EndOfStream)
 				{
-					string line = solution.ReadLine();
+					string line = solutionReader.ReadLine();
 					solutionWords.Add(line);
 					solutionFileLength++;
 				}
-				solution.Close();
+				solutionReader.Close();
 			}
 			catch (Exception e)
 			{
@@ -83,6 +83,9 @@ namespace Wordle
 
 			// The word that the user guesses. This is used to compare against the list of valid words.
 			string guessedWord = null;
+
+			// Array that stores the amount of times each letter is used in the solution word
+			int[] solution = new int[26];
 
 			// The position the console needs to print to
 			int posLeft = 0;
@@ -186,10 +189,17 @@ namespace Wordle
 
 					if (validWords.Contains(guessedWord))
 					{
+						foreach (char c in solutionWord)
+						{
+							solution[(c - 'a')]++;
+						}
+
 						for (int i = 0; i < 5; i++)
 						{
-							if (guessedWord[i] == solutionWord[i]) // The guessed letter is correct and in the correct position.
+							if (guessedWord[i] == solutionWord[i])
 							{
+								solution[guessedWord[i] - 'a']--;
+
 								// Add a '2' to the turn array for scoring.
 								switch (turn)
 								{
@@ -235,8 +245,10 @@ namespace Wordle
 								Console.Write(guess[i]);
 								Console.ResetColor();
 							}
-							else if (solutionWord.Contains(guessedWord[i])) // The guessed letter is correct but in the wrong position.
+							else if (solutionWord.Contains(guessedWord[i]) && solution[guessedWord[i] - 'a'] > 0)
 							{
+								solution[guessedWord[i] - 'a']--;
+
 								// Add a '1' (wrong place) to the turn array for scoring.
 								switch (turn)
 								{
@@ -341,7 +353,6 @@ namespace Wordle
 								break;
 						}
 					}
-
 					else
 					{
 						for (int i = 4; i >= 0; i--)
