@@ -61,8 +61,8 @@ namespace Wordle
 
 			// Pick a solution from the solutionWords list
 			Random rng = new Random();
-			// string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
-			string solutionWord = "greet";
+			string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
+			// string solutionWord = "greet";
 
 			// An array of each character guessed
 			char[] guess = new char[5];
