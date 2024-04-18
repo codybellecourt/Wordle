@@ -61,25 +61,21 @@ namespace Wordle
 
 			// Pick a solution from the solutionWords list
 			Random rng = new Random();
-			string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
+			// string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
+			string solutionWord = "greet";
 
 			// An array of each character guessed
 			char[] guess = new char[5];
 
-			// Arrays for scoring
-			int[] turn1 = new int[5];
-			int[] turn2 = new int[5];
-			int[] turn3 = new int[5];
-			int[] turn4 = new int[5];
-			int[] turn5 = new int[5];
-			int[] turn6 = new int[5];
+			// Array for scoring and checking.
+			int[,] scoring = new int[6,5];
 
 
 			// The character in the word guessed
 			int index = 0;
 
 			// What turn the player is on
-			int turn = 1;
+			int turn = 0;
 
 			// The word that the user guesses. This is used to compare against the list of valid words.
 			string guessedWord = null;
@@ -129,22 +125,22 @@ namespace Wordle
 				// Change the cursor position (row) depending on what turn the player is on.
 				switch (turn)
 				{
-					case 1:
+					case 0:
 						posTop = 0;
 						break;
-					case 2:
+					case 1:
 						posTop = 2;
 						break;
-					case 3:
+					case 2:
 						posTop = 4;
 						break;
-					case 4:
+					case 3:
 						posTop = 6;
 						break;
-					case 5:
+					case 4:
 						posTop = 8;
 						break;
-					case 6:
+					case 5:
 						posTop = 10;
 						break;
 				}
@@ -181,47 +177,35 @@ namespace Wordle
 				}
 				else if (keyInfo.Key == ConsoleKey.Enter && index == 5)
 				{
-					// Print each character in the guess array.
+					// Echo each character in the guess array.
 					foreach (char c in guess)
 					{
 						guessedWord += Char.ToLower(c);
 					}
 
+					// Echo each character and increment by one in the solution array. a=0, b=1, c=2, etc.
+					foreach (char c in solutionWord)
+					{
+						solution[(c - 'a')]++;
+					}
+
+					// Check to make sure the guessed word is valid.
 					if (validWords.Contains(guessedWord))
 					{
-						foreach (char c in solutionWord)
-						{
-							solution[(c - 'a')]++;
-						}
-
+						// Check the guessed word letter by letter.
 						for (int i = 0; i < 5; i++)
 						{
+							// If the guessed letter is in the correct place in the solution word.
 							if (guessedWord[i] == solutionWord[i])
 							{
+								// Decrement the letter by one in the solution array, so the letter isn't counted twice.
 								solution[guessedWord[i] - 'a']--;
 
-								// Add a '2' to the turn array for scoring.
-								switch (turn)
-								{
-									case 1:
-										turn1[i] = 2;
-										break;
-									case 2:
-										turn2[i] = 2;
-										break;
-									case 3:
-										turn3[i] = 2;
-										break;
-									case 4:
-										turn4[i] = 2;
-										break;
-									case 5:
-										turn5[i] = 2;
-										break;
-								}
+								// Add a '2' (correct place) to the turn array for scoring.
+								scoring[turn, i] = 2;
 
+								// Move the cursor to the correct position.
 								int posLeftCheck = 0;
-
 								switch (i)
 								{
 									case 0:
@@ -240,37 +224,29 @@ namespace Wordle
 										posLeftCheck = 21;
 										break;
 								}
+
+								// Color the letter green in the console.
 								Console.SetCursorPosition(posLeftCheck, posTop);
 								Console.ForegroundColor = ConsoleColor.Green;
 								Console.Write(guess[i]);
 								Console.ResetColor();
 							}
-							else if (solutionWord.Contains(guessedWord[i]) && solution[guessedWord[i] - 'a'] > 0)
+						}
+						
+						// Next check the yellow words
+						for (int i = 0; i < 5; i++)
+						{
+							//  Checked letter is in the solution.       The letter is in solution array.      The letter hasn't already been changed.
+							if (solutionWord.Contains(guessedWord[i]) && solution[guessedWord[i] - 'a'] > 0 && !(scoring[turn, i] == 2))
 							{
+								// Decrement the letter by one in the solution array, so the letter isn't counted twice.
 								solution[guessedWord[i] - 'a']--;
 
 								// Add a '1' (wrong place) to the turn array for scoring.
-								switch (turn)
-								{
-									case 1:
-										turn1[i] = 1;
-										break;
-									case 2:
-										turn2[i] = 1;
-										break;
-									case 3:
-										turn3[i] = 1;
-										break;
-									case 4:
-										turn4[i] = 1;
-										break;
-									case 5:
-										turn5[i] = 1;
-										break;
-								}
+								scoring[turn, i] = 1;
 
+								// Move the cursor to the correct position.
 								int posLeftCheck = 0;
-
 								switch (i)
 								{
 									case 0:
@@ -289,6 +265,8 @@ namespace Wordle
 										posLeftCheck = 21;
 										break;
 								}
+
+								// Color the letter yellow in the console.
 								Console.SetCursorPosition(posLeftCheck, posTop);
 								Console.ForegroundColor = ConsoleColor.Yellow;
 								Console.Write(guess[i]);
@@ -297,66 +275,46 @@ namespace Wordle
 							else
 							{
 								// Add a '0' (incorrect) to the turn array for scoring.
-								switch (turn)
-								{
-									case 1:
-										turn1[i] = 0;
-										break;
-									case 2:
-										turn2[i] = 0;
-										break;
-									case 3:
-										turn3[i] = 0;
-										break;
-									case 4:
-										turn4[i] = 0;
-										break;
-									case 5:
-										turn5[i] = 0;
-										break;
-								}
+								scoring[turn, i] = 0;
 							}
 						}
-
-						// Reset the index and guessedWord variables for the next turn
-						index = 0;
-						guessedWord = null;
-						Array.Clear(guess, 0, guess.Length);
-
 
 						// Check if the game should continue
 						switch ((turn, (guessedWord == solutionWord)))
 						{
+							case (0, true):
 							case (1, true):
 							case (2, true):
 							case (3, true):
 							case (4, true):
 							case (5, true):
-							case (6, true):
 								Console.SetCursorPosition(0, 12);
 								Console.WriteLine("You got it right!\n");
-								Result(turn1, turn2, turn3, turn4, turn5, turn6);
+								Result(scoring);
 								break;
 
+							case (0, false):
 							case (1, false):
 							case (2, false):
 							case (3, false):
 							case (4, false):
-							case (5, false):
 								turn++;
 								break;
 
-							case (6, false):
+							case (5, false):
 								Console.SetCursorPosition(0, 12);
 								Console.WriteLine("The word was " + solutionWord + "\n");
-								Result(turn1, turn2, turn3, turn4, turn5, turn6);
+								Result(scoring);
 								break;
 						}
 					}
+					// The word is not valid.
 					else
 					{
+						// For each letter...
 						for (int i = 4; i >= 0; i--)
 						{
+							// Place the cursor in the correct place.
 							switch (i)
 							{
 								case 0:
@@ -375,160 +333,63 @@ namespace Wordle
 									posLeft = 21;
 									break;
 							}
-
 							Console.SetCursorPosition(posLeft, posTop);
+
+							// Clear the letter.
 							Console.Write(' ');
 						}
-
-						// Reset the index and guessedWord variables.
-						index = 0;
-						guessedWord = null;
-						Array.Clear(guess, 0, guess.Length);
 					}
 
+					// Reset the guessing variables.
+					index = 0;
+					guessedWord = null;
+					Array.Clear(guess, 0, guess.Length);
+
+					// Clear the solution array.
+					Array.Clear(solution, 0, solution.Length);
 				}
 			}
 		}
 
-		static void Result(int[] turn1, int[] turn2, int[] turn3, int[] turn4, int[] turn5, int[] turn6)
+		static void Result(int[,] scoring)
 		{
 			string copyToClipboard = "";
-			string emoji0 = "⬜";
-			string emoji1 = "🟨";
-			string emoji2 = "🟩";
+			string emoji0 = "⬜"; // "Large White Square" U+2B1C unicode symbol. 
+			string emoji1 = "🟨"; // "Large Yellow Square" U+1F7E8 unicode symbol
+			string emoji2 = "🟩"; // "Large Green Square" U+1F7E9 unicode symbol
 
-			foreach (int c in turn1)
+			// For each row in the scoring array...
+			for (int i = 0; i < 6; i++)
 			{
-				switch (c)
+				// For each collumn in the scoring array...
+				for (int j = 0; j < 5; j++)
 				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
+					// Do the correct actions depending on what the guess was.
+					switch (scoring[i, j])
+					{
+						case 0:
+							copyToClipboard += emoji0;
+							Console.ForegroundColor = ConsoleColor.White;
+							Console.Write("■"); // "Black Square" U+25A0 unicode symbol.
+							break;
+						case 1:
+							copyToClipboard += emoji1;
+							Console.ForegroundColor = ConsoleColor.Yellow;
+							Console.Write("■"); // "Black Square" U+25A0 unicode symbol.
+							break;
+						case 2:
+							copyToClipboard += emoji2;
+							Console.ForegroundColor = ConsoleColor.Green;
+							Console.Write("■"); // "Black Square" U+25A0 unicode symbol.
+							break;
+					}
+					Console.ResetColor();
 				}
-				Console.Write("■");
-				Console.ResetColor();
-			}
-			Console.WriteLine();
-			copyToClipboard += "\n";
-			foreach (int c in turn2)
-			{
-				switch (c)
-				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
-				}
-				Console.Write("■");
-				Console.ResetColor();
-			}
-			Console.WriteLine();
-			copyToClipboard += "\n";
-			foreach (int c in turn3)
-			{
-				switch (c)
-				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
-				}
-				Console.Write("■");
-				Console.ResetColor();
-			}
-			Console.WriteLine();
-			copyToClipboard += "\n";
-			foreach (int c in turn4)
-			{
-				switch (c)
-				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
-				}
-				Console.Write("■");
-				Console.ResetColor();
-			}
-			Console.WriteLine();
-			copyToClipboard += "\n";
-			foreach (int c in turn5)
-			{
-				switch (c)
-				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
-				}
-				Console.Write("■");
-				Console.ResetColor();
-			}
-			Console.WriteLine();
-			copyToClipboard += "\n";
-			foreach (int c in turn6)
-			{
-				switch (c)
-				{
-					case 0:
-						Console.ForegroundColor = ConsoleColor.White;
-						copyToClipboard += emoji0;
-						break;
-					case 1:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						copyToClipboard += emoji1;
-						break;
-					case 2:
-						Console.ForegroundColor = ConsoleColor.Green;
-						copyToClipboard += emoji2;
-						break;
-				}
-				Console.Write("■");
-				Console.ResetColor();
+				Console.WriteLine();
+				copyToClipboard += "\n";
 			}
 
-			Console.WriteLine("Would you like to copy your game result to the clipboard?");
+			Console.WriteLine("\nWould you like to copy your game result to the clipboard? (y/n)");
 			var keyInfo = Console.ReadKey(intercept: true);
 			if (keyInfo.KeyChar == 'y')
 			{
