@@ -61,8 +61,8 @@ namespace Wordle
 
 			// Pick a solution from the solutionWords list
 			Random rng = new Random();
-			string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
-			// string solutionWord = "greet";
+			// string solutionWord = solutionWords[rng.Next(solutionWords.Count)];
+			string solutionWord = "greet";
 
 			// An array of each character guessed
 			char[] guess = new char[5];
@@ -272,7 +272,7 @@ namespace Wordle
 								Console.Write(guess[i]);
 								Console.ResetColor();
 							}
-							else
+							else if (!(scoring[turn, i] == 2))
 							{
 								// Add a '0' (incorrect) to the turn array for scoring.
 								scoring[turn, i] = 0;
@@ -361,7 +361,7 @@ namespace Wordle
 			// For each row in the scoring array...
 			for (int i = 0; i < 6; i++)
 			{
-				// For each collumn in the scoring array...
+				// For each column in the scoring array...
 				for (int j = 0; j < 5; j++)
 				{
 					// Do the correct actions depending on what the guess was.
